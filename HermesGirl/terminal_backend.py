@@ -116,13 +116,25 @@ class TerminalBackend(QObject):
             self._debug("process started, pid =", self.process.pid)
             self.process_started.emit()
 
+
         except FileNotFoundError:
+
             message = (
-                f"Cannot find command: {self.command}\n"
-                "Check HERMES_COMMAND in main.py.\n"
-                "If PyCharm cannot find Hermes, use the full path from `which hermes`."
+
+                f"Cannot find command: {self.command}\n\n"
+
+                "Hermes could not be located.\n"
+
+                "If you installed Hermes, check its path with:\n"
+
+                "    which hermes\n\n"
+
+                "Then either add that path to the app search list or configure HERMES_COMMAND."
+
             )
+
             self._debug(message)
+
             self.error_received.emit(message)
 
         except Exception as e:
