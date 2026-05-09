@@ -1,7 +1,7 @@
 import os
 import re
 from typing import Dict, Optional
-
+from paths import resource_path
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QPixmap,QImage
 from PySide6.QtWidgets import (
@@ -48,8 +48,8 @@ class AvatarManager:
         "confused",
     ]
 
-    def __init__(self, avatar_dir: str = "assets/avatar"):
-        self.avatar_dir = avatar_dir
+    def __init__(self, avatar_dir: str = None):
+        self.avatar_dir = avatar_dir or resource_path("assets/avatar")
         self.current_state = "idle"
         self.pixmaps: Dict[str, QPixmap] = {}
 

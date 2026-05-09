@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QSplitter,
 )
+from hermes_locator import build_hermes_command
 from avatar_event_filter import detect_avatar_state_from_terminal
 from web_terminal_panel import WebTerminalPanel
 from avatar_manager import AvatarPanel
@@ -15,7 +16,10 @@ from avatar_manager import AvatarPanel
 
 WINDOW_TITLE = "Anna"
 #HERMES_COMMAND = ["/bin/bash", "-lc", "for i in {1..20}; do echo tick-$i; sleep 1; done; exec /bin/bash -i"]
-HERMES_COMMAND = ["hermes"]
+try:
+    HERMES_COMMAND = build_hermes_command(use_yolo=False)
+except FileNotFoundError:
+    HERMES_COMMAND = None
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -49,7 +53,7 @@ class MainWindow(QMainWindow):
         self.suppress_talking_until = 0.0
         self.last_user_input_time = 0.0
 
-        self.terminal_panel = WebTerminalPanel(HERMES_COMMAND)
+        self.terminal_panel = WebTerminalPanel(HERMES_COMMAND or ["hermes"])
         self.avatar_panel = AvatarPanel()
 
         splitter = QSplitter(Qt.Horizontal)

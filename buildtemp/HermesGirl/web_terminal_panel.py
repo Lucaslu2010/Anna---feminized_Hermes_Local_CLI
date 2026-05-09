@@ -1,7 +1,7 @@
 import json
 import os
 from typing import Optional, List
-
+from paths import resource_path
 from PySide6.QtCore import QUrl, Slot, QTimer
 from PySide6.QtWebChannel import QWebChannel
 from PySide6.QtWebEngineWidgets import QWebEngineView
@@ -42,9 +42,7 @@ class WebTerminalPanel(QWebEngineView):
         self.backend.output_received.connect(self.queue_terminal_output)
         self.backend.error_received.connect(self.write_error_to_terminal)
 
-        html_path = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "web", "terminal.html")
-        )
+        html_path = resource_path("web/terminal.html")
 
         if not os.path.exists(html_path):
             raise FileNotFoundError(f"Cannot find terminal.html: {html_path}")
