@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hermes Terminal</title>
+
+    <link rel="stylesheet" href="./vendor/xterm.css">
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #050505;
+            overflow: hidden;
+        }
+
+        #terminal {
+            width: 100%;
+            height: 100%;
+            background: #050505;
+        }
+
+        #status {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            color: #50fa7b;
+            font-family: Menlo, Monaco, Consolas, monospace;
+            font-size: 14px;
+            z-index: 10;
+            white-space: pre-wrap;
+        }
+
+        .xterm {
+            height: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .xterm-viewport {
+            background-color: #050505 !important;
+        }
+
+        .xterm-screen {
+            background-color: #050505 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="status">Loading terminal...</div>
+    <div id="terminal"></div>
+
+    <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <script src="./vendor/xterm.js"></script>
+    <script src="./vendor/addon-fit.js"></script>
+
+    <script>
+        const statusBox = document.getElementById("status");
+
+        function setStatus(text, color = "#50fa7b") {
+            statusBox.style.display = "block";
+            statusBox.innerText = text;
+            statusBox.style.color = color;
+        }
+
+        window.onerror = function(message, source, lineno, colno, error) {
+            setStatus(
+                "JavaScript error:\n" +
+                message + "\nLine: " + lineno + ":" + colno,
+                "#ff5555"
+            );
+        };
+
+        if (typeof Terminal === "undefined") {
+            setStatus("ERROR: xterm.js failed to load.", "#ff5555");
+        } else {
+            const term = new Terminal({
+                cursorBlink: true,
+                cursorStyle: "block",
+                fontFamily: "Menlo, Monaco, Consolas, monospace",
+                fontSize: 14,
+                lineHeight: 1.15,
+                convertEol: false,
+                scrollback: 5000,
+                theme: {
+                    background: "#050505",
+                    foreground: "#e6edf3",
+                    cursor: "#ffffff",
+                    selectionBackground: "#264f78"
+                }
+            });
+
+            let fitAddon = null;
+
+            if (typeof FitAddon !== "undefined") {
+                fitAddon = new FitAddon.FitAddon();
+                term.loadAddon(fitAddon);
+            }
+
+            term.open(document.getElementById("terminal"));
+
+            if (fitAddon) {
+                fitAddon.fit();
+            }
+
+            term.focus();
+            statusBox.style.display = "none";
+
+            let pyBackend = null;
+
+            function fitAndNotify() {
+                if (fitAddon) {
+                    fitAddon.fit();
+                }
+
+                if (pyBackend) {
+                    pyBackend.resize_pty(term.cols, term.rows);
+                }
+            }
+
+            new QWebChannel(qt.webChannelTransport, function(channel) {
+    pyBackend = channel.objects.terminalBackend;
+
+    term.writeln("Connecting to Hermes...");
+    term.writeln("");
+
+    term.onData(function(data) {
+        if (pyBackend) {
+            pyBackend.write_input(data);
+        }
+    });
+
+    fitAndNotify();
+
+    // Start Hermes only after xterm and QWebChannel are ready.
+    pyBackend.start_process();
+});
+
+            window.terminalOutputBuffer = [];
+
+window.writeToTerminal = function(text) {
+    if (text) {
+        window.terminalOutputBuffer.push(text);
+    }
+};
+
+window.flushTerminalOutput = function() {
+    if (!window.terminalOutputBuffer || window.terminalOutputBuffer.length === 0) {
+        return;
+    }
+
+    const text = window.terminalOutputBuffer.join("");
+    window.terminalOutputBuffer = [];
+
+    term.write(text);
+};
+
+window.forceTerminalRefresh = function() {
+    try {
+        if (window.flushTerminalOutput) {
+            window.flushTerminalOutput();
+        }
+    } catch (e) {
+        console.log("forceTerminalRefresh failed:", e);
+    }
+};
+
+setInterval(function() {
+    window.flushTerminalOutput();
+}, 30);
+            window.forceTerminalRefresh = function() {
+    try {
+        term.refresh(0, term.rows - 1);
+    } catch (e) {
+        console.log("forceTerminalRefresh failed:", e);
+    }
+};
+            window.clearTerminal = function() {
+                term.clear();
+            };
+
+            window.addEventListener("resize", function() {
+                fitAndNotify();
+            });
+
+            document.body.addEventListener("click", function() {
+                term.focus();
+            });
+        }
+    </script>
+</body>
+</html>
