@@ -6,10 +6,12 @@ from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
     QSplitter,
+    QStackedWidget,
 )
 from paths import resource_path
 from hermes_locator import build_hermes_command
 from avatar_event_filter import detect_avatar_state_from_terminal
+from gateway_chat_panel import GatewayChatPanel
 from web_terminal_panel import WebTerminalPanel
 from avatar_manager import AvatarPanel
 from hermes_settings_dialog import (
@@ -57,15 +59,21 @@ class MainWindow(QMainWindow):
         self.current_avatar_state = "idle"
         self.last_avatar_state_change = 0.0
         self.avatar_min_hold_seconds = 0.8
+        self.avatar_talking_min_hold_seconds = 5.0
+        self.pending_avatar_state = ""
 
         self.suppress_talking_until = 0.0
         self.last_user_input_time = 0.0
+        self.last_protocol_state_time = 0.0
 
-        self.terminal_panel = WebTerminalPanel(HERMES_COMMAND or ["hermes"])
+        self.chat_panel = GatewayChatPanel()
+        self.terminal_panel = None
         self.avatar_panel = AvatarPanel()
+        self.content_stack = QStackedWidget()
+        self.content_stack.addWidget(self.chat_panel)
 
         splitter = QSplitter(Qt.Horizontal)
-        splitter.addWidget(self.terminal_panel)
+        splitter.addWidget(self.content_stack)
         splitter.addWidget(self.avatar_panel)
 
         splitter.setStretchFactor(0, 4)
@@ -77,16 +85,24 @@ class MainWindow(QMainWindow):
         self.avatar_idle_timer.setSingleShot(True)
         self.avatar_idle_timer.timeout.connect(self.set_avatar_idle)
 
-        self.terminal_panel.backend.raw_output_received.connect(self.handle_terminal_output)
-        self.terminal_panel.backend.user_input_received.connect(self.handle_user_input_activity)
-        self.terminal_panel.backend.process_started.connect(self.handle_terminal_started)
-        self.terminal_panel.backend.process_stopped.connect(self.handle_terminal_stopped)
-        self.terminal_panel.backend.error_received.connect(self.handle_terminal_error)
+        self.avatar_pending_timer = QTimer(self)
+        self.avatar_pending_timer.setSingleShot(True)
+        self.avatar_pending_timer.timeout.connect(self.apply_pending_avatar_state)
+
+        self.chat_panel.avatar_state_received.connect(self.handle_avatar_state_event)
+        self.chat_panel.user_input_received.connect(self.handle_user_input_activity)
+        self.chat_panel.assistant_output_received.connect(self.handle_gateway_output)
+        self.chat_panel.error_received.connect(self.handle_terminal_error)
 
         self.setup_avatar_buttons()
         self.set_avatar_idle()
 
     def setup_avatar_buttons(self):
+        self.mode_switch_button = self.avatar_panel.add_panel_button(
+            "Switch to CLI",
+            self.toggle_chat_mode,
+            column_span=2,
+        )
         self.avatar_panel.add_panel_button(
             "RAG",
             self.open_rag_manager,
@@ -105,6 +121,13 @@ class MainWindow(QMainWindow):
         )
 
     @Slot()
+    def toggle_chat_mode(self):
+        if self.content_stack.currentWidget() is self.chat_panel:
+            self.show_cli_terminal()
+        else:
+            self.show_gateway_chat()
+
+    @Slot()
     def open_rag_manager(self):
         dialog = RagManagerDialog(self)
         dialog.exec()
@@ -113,7 +136,29 @@ class MainWindow(QMainWindow):
     def open_embedding_settings(self):
         dialog = RagSettingsDialog(self)
         if dialog.exec():
-            self.terminal_panel.backend.reload_rag_config()
+            self.chat_panel.reload_rag_config()
+            if self.terminal_panel:
+                self.terminal_panel.backend.reload_rag_config()
+
+    @Slot()
+    def show_gateway_chat(self):
+        self.content_stack.setCurrentWidget(self.chat_panel)
+        self.mode_switch_button.setText("Switch to CLI")
+
+    @Slot()
+    def show_cli_terminal(self):
+        if self.terminal_panel is None:
+            self.terminal_panel = WebTerminalPanel(HERMES_COMMAND or ["hermes"])
+            self.terminal_panel.backend.raw_output_received.connect(self.handle_terminal_output)
+            self.terminal_panel.backend.avatar_state_received.connect(self.handle_avatar_state_event)
+            self.terminal_panel.backend.user_input_received.connect(self.handle_user_input_activity)
+            self.terminal_panel.backend.process_started.connect(self.handle_terminal_started)
+            self.terminal_panel.backend.process_stopped.connect(self.handle_terminal_stopped)
+            self.terminal_panel.backend.error_received.connect(self.handle_terminal_error)
+            self.content_stack.addWidget(self.terminal_panel)
+
+        self.content_stack.setCurrentWidget(self.terminal_panel)
+        self.mode_switch_button.setText("Switch to Chat")
 
     @Slot()
     def open_hermes_settings(self):
@@ -134,6 +179,7 @@ class MainWindow(QMainWindow):
         self.avatar_panel.update_to_idle()
         self.current_avatar_state = "idle"
         self.last_avatar_state_change = time.monotonic()
+        self.pending_avatar_state = ""
 
     def avatar_state_priority(self, state: str) -> int:
         priorities = {
@@ -153,15 +199,22 @@ class MainWindow(QMainWindow):
         return priorities.get(state, 0)
 
     def set_avatar_state_safely(self, new_state: str):
+        new_state = self.normalize_avatar_state(new_state)
         if not new_state:
-            return
+            return False
 
         now = time.monotonic()
 
         old_state = self.current_avatar_state
 
         if new_state == old_state:
-            return
+            if new_state in ["talking", "explain", "thinking", "listening", "searching", "coding"]:
+                self.pending_avatar_state = ""
+            return True
+
+        if self.should_hold_current_state(old_state, new_state, now):
+            self.defer_avatar_state(new_state, old_state, now)
+            return False
 
         old_priority = self.avatar_state_priority(old_state)
         new_priority = self.avatar_state_priority(new_state)
@@ -173,7 +226,8 @@ class MainWindow(QMainWindow):
             self.avatar_panel.update_avatar(new_state)
             self.current_avatar_state = new_state
             self.last_avatar_state_change = now
-            return
+            self.pending_avatar_state = ""
+            return True
 
         # Do not let thinking overwrite active high-value states.
         if new_state == "thinking" and old_state in [
@@ -182,15 +236,93 @@ class MainWindow(QMainWindow):
             "explain",
             "success",
         ]:
-            return
+            return False
 
         # Do not switch too fast between ordinary states.
         if elapsed < self.avatar_min_hold_seconds:
-            return
+            return False
 
         self.avatar_panel.update_avatar(new_state)
         self.current_avatar_state = new_state
         self.last_avatar_state_change = now
+        self.pending_avatar_state = ""
+        return True
+
+    def set_avatar_state_from_protocol(self, new_state: str):
+        new_state = self.normalize_avatar_state(new_state)
+        if not new_state:
+            return
+
+        if new_state == "idle":
+            self.schedule_avatar_idle_for_current_state()
+            return
+
+        applied = self.set_avatar_state_safely(new_state)
+
+        if applied and new_state not in ["thinking", "listening"]:
+            self.avatar_idle_timer.start(self.idle_delay_for_state(new_state))
+
+    def normalize_avatar_state(self, state: str) -> str:
+        state = (state or "").strip().lower()
+        if state == "explaining":
+            return "explain"
+        return state
+
+    def should_hold_current_state(self, old_state: str, new_state: str, now: float) -> bool:
+        if old_state not in ["talking", "explain"]:
+            return False
+
+        if new_state not in ["idle", "success", "happy"]:
+            return False
+
+        elapsed = now - self.last_avatar_state_change
+        return elapsed < self.avatar_talking_min_hold_seconds
+
+    def defer_avatar_state(self, new_state: str, old_state: str, now: float):
+        remaining = self.avatar_talking_min_hold_seconds - (now - self.last_avatar_state_change)
+        delay_ms = max(0, int(remaining * 1000))
+        self.pending_avatar_state = new_state
+        self.avatar_pending_timer.start(delay_ms)
+
+    @Slot()
+    def apply_pending_avatar_state(self):
+        state = self.pending_avatar_state
+        self.pending_avatar_state = ""
+        if not state:
+            return
+
+        if state == "idle":
+            self.set_avatar_idle()
+        else:
+            applied = self.set_avatar_state_safely(state)
+            if applied and state not in ["thinking", "listening"]:
+                self.avatar_idle_timer.start(self.idle_delay_for_state(state))
+
+    def schedule_avatar_idle_for_current_state(self, base_delay_ms: int = 0):
+        now = time.monotonic()
+        delay_ms = base_delay_ms
+        if self.current_avatar_state in ["talking", "explain"]:
+            remaining = self.avatar_talking_min_hold_seconds - (
+                now - self.last_avatar_state_change
+            )
+            delay_ms = max(delay_ms, int(max(0.0, remaining) * 1000))
+
+        self.pending_avatar_state = "idle"
+        self.avatar_pending_timer.start(max(0, delay_ms))
+
+    def idle_delay_for_state(self, state: str) -> int:
+        if state in ["talking", "explain"]:
+            return int(self.avatar_talking_min_hold_seconds * 1000)
+        if state in ["success", "happy"]:
+            return 4000
+        if state in ["warning", "searching", "coding"]:
+            return 4500
+        return 2500
+
+    @Slot(str)
+    def handle_avatar_state_event(self, state: str):
+        self.last_protocol_state_time = time.monotonic()
+        self.set_avatar_state_from_protocol(state)
 
     @Slot(str)
     def handle_user_input_activity(self, data: str):
@@ -241,6 +373,9 @@ class MainWindow(QMainWindow):
         if not raw_text:
             return
 
+        if time.monotonic() - self.last_protocol_state_time < 0.6:
+            return
+
         state = detect_avatar_state_from_terminal(raw_text)
 
         if state is None:
@@ -255,7 +390,23 @@ class MainWindow(QMainWindow):
 
         if state not in ["thinking", "listening"]:
             self.has_real_agent_output = True
-            self.avatar_idle_timer.start(2500)
+            self.avatar_idle_timer.start(self.idle_delay_for_state(state))
+
+    @Slot(str)
+    def handle_gateway_output(self, text: str):
+        if not text:
+            return
+
+        if time.monotonic() - self.last_protocol_state_time < 0.6:
+            return
+
+        state = detect_avatar_state_from_terminal(text)
+        if state:
+            self.set_avatar_state_safely(state)
+
+        if state not in [None, "thinking", "listening"]:
+            self.has_real_agent_output = True
+            self.avatar_idle_timer.start(self.idle_delay_for_state(state))
 
     @Slot(str)
     def handle_terminal_error(self, error_text: str):
@@ -263,6 +414,9 @@ class MainWindow(QMainWindow):
         print(error_text)
 
     def closeEvent(self, event):
+        if self.chat_panel:
+            self.chat_panel.stop()
+
         if self.terminal_panel:
             self.terminal_panel.stop()
 

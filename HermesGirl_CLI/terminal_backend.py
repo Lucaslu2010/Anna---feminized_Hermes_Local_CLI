@@ -1,5 +1,6 @@
 import os
 import pty
+import re
 import signal
 import select
 import struct
@@ -42,6 +43,7 @@ class TerminalBackend(QObject):
     error_received = Signal(str)
     user_input_received = Signal(str)
     rag_status_received = Signal(str)
+    avatar_state_received = Signal(str)
 
     def __init__(
         self,
@@ -64,6 +66,7 @@ class TerminalBackend(QObject):
         self.rag = RagContextManager()
         self.hidden_echo_lock = threading.Lock()
         self.hidden_echo_until = 0.0
+        self.avatar_event_buffer = ""
 
     def _debug(self, *args):
         if self.debug:
@@ -290,6 +293,7 @@ class TerminalBackend(QObject):
 
                 raw = b"".join(chunks)
                 text = raw.decode("utf-8", errors="replace")
+                text = self._extract_avatar_state_events(text)
                 text = self._filter_hidden_programmatic_echo(text)
                 if not text:
                     continue
@@ -376,11 +380,12 @@ class TerminalBackend(QObject):
             self.rag_status_received.emit("Preparing message...")
             prompt = self.rag.build_cli_prompt(message)
 
-            if prompt != message:
+            if self.rag.last_context_used:
                 self.rag_status_received.emit("RAG context added.")
-                self._type_text_to_pty(prompt)
             else:
-                self._type_text_to_pty(message)
+                self.rag_status_received.emit("Sending message...")
+
+            self._type_text_to_pty(prompt)
 
         except Exception as e:
             self.rag_status_received.emit(f"RAG unavailable: {e}")
@@ -418,6 +423,32 @@ class TerminalBackend(QObject):
                 return ""
 
         return text
+
+    def _extract_avatar_state_events(self, text: str) -> str:
+        data = self.avatar_event_buffer + (text or "")
+        self.avatar_event_buffer = ""
+
+        visible_parts = []
+        position = 0
+
+        for match in AVATAR_CONTROL_RE.finditer(data):
+            visible_parts.append(data[position : match.start()])
+            self.avatar_state_received.emit(extract_state_from_match(match))
+            position = match.end()
+
+        remainder = data[position:]
+        partial_start = find_partial_avatar_event_start(remainder)
+        if partial_start >= 0:
+            possible_event = remainder[partial_start:]
+            if "\n" in possible_event or "\r" in possible_event or len(possible_event) > 80:
+                visible_parts.append(remainder)
+            else:
+                visible_parts.append(remainder[:partial_start])
+                self.avatar_event_buffer = possible_event
+        else:
+            visible_parts.append(remainder)
+
+        return "".join(visible_parts)
 
     @Slot(str, str)
     def attach_file_text(self, name: str, text: str):
@@ -529,3 +560,98 @@ def sanitize_terminal_input(text: str) -> str:
             cleaned.append(ch)
 
     return " ".join("".join(cleaned).split())
+
+
+AVATAR_STATES = {
+    "idle",
+    "listening",
+    "thinking",
+    "searching",
+    "coding",
+    "explain",
+    "explaining",
+    "success",
+    "warning",
+}
+
+AVATAR_STATE_EVENT_RE = re.compile(
+    r"""
+    ^[^\S\r\n]*@@S:(idle|listening|thinking|searching|coding|explain|explaining|success|warning)@@[^\S\r\n]*(?:\r?\n)?
+    |
+    @@S:(idle|listening|thinking|searching|coding|explain|explaining|success|warning)@@
+    """,
+    re.IGNORECASE | re.VERBOSE | re.MULTILINE,
+)
+
+AVATAR_STATE_PROSE_RE = re.compile(
+    r"""
+    ^[^\r\n]*
+    (?:
+        currentState
+        |
+        avatar\s*state
+        |
+        state
+        |
+        状态
+    )
+    [^\r\n]{0,40}?
+    (?:
+        已更新为
+        |
+        更新为
+        |
+        变为
+        |
+        切换为
+        |
+        updated\s+to
+        |
+        set\s+to
+        |
+        changed\s+to
+    )
+    \s*
+    (idle|listening|thinking|searching|coding|explain|explaining|success|warning)
+    [^\r\n]*
+    (?:\r?\n)?
+    """,
+    re.IGNORECASE | re.VERBOSE | re.MULTILINE,
+)
+
+AVATAR_CONTROL_RE = re.compile(
+    f"{AVATAR_STATE_EVENT_RE.pattern}|{AVATAR_STATE_PROSE_RE.pattern}",
+    re.IGNORECASE | re.VERBOSE | re.MULTILINE,
+)
+
+
+def normalize_avatar_state(state: str) -> str:
+    state = (state or "").strip().lower()
+    if state == "explaining":
+        return "explain"
+    if state in AVATAR_STATES:
+        return state
+    return "idle"
+
+
+def extract_state_from_match(match) -> str:
+    for group in match.groups():
+        if group:
+            return normalize_avatar_state(group)
+
+    return "idle"
+
+
+def find_partial_avatar_event_start(text: str) -> int:
+    if not text:
+        return -1
+
+    marker_start = text.rfind("@@S:")
+    if marker_start >= 0 and "@@" not in text[marker_start + 4 :]:
+        return marker_start
+
+    for prefix in ["@@S", "@@", "@"]:
+        if text.endswith(prefix):
+            return len(text) - len(prefix)
+
+    return -1

@@ -527,7 +527,7 @@ class AvatarPanel(QFrame):
 
         self.update_avatar("idle")
 
-    def add_panel_button(self, text: str, callback):
+    def add_panel_button(self, text: str, callback, column_span: int = 1):
         button = QPushButton(text)
         button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         button.setMinimumHeight(28)
@@ -535,8 +535,15 @@ class AvatarPanel(QFrame):
 
         row = self.button_count // 2
         column = self.button_count % 2
-        self.button_layout.addWidget(button, row, column)
-        self.button_count += 1
+        span = max(1, min(column_span, 2))
+
+        if span == 2 and column != 0:
+            self.button_count += 1
+            row = self.button_count // 2
+            column = 0
+
+        self.button_layout.addWidget(button, row, column, 1, span)
+        self.button_count += span
 
         return button
 

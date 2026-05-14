@@ -11,6 +11,11 @@ RAG_RELEVANCE_THRESHOLD = 0.34
 RAG_MAX_RESULTS = 2
 RAG_SUMMARY_CHARS = 80
 RAG_EVIDENCE_CHARS = 220
+STATE_PROTOCOL = (
+    "AvatarCtrl: on state change, output one standalone line like @@S:thinking@@. "
+    "States idle/listening/thinking/searching/coding/explaining/success/warning. "
+    "No prose about state. End @@S:idle@@."
+)
 
 
 class RagContextManager:
@@ -22,6 +27,7 @@ class RagContextManager:
         self.client = client or EmbeddingClient()
         self.store = store or RagStore()
         self.recent_files: Dict[str, str] = {}
+        self.last_context_used = False
 
     def reload_config(self):
         self.client = EmbeddingClient()
@@ -104,11 +110,14 @@ class RagContextManager:
         return "\n\n".join(sections).strip()
 
     def build_augmented_prompt(self, user_message: str) -> str:
+        self.last_context_used = False
         context = self.build_context(user_message)
+        self.last_context_used = bool(context)
         if not context:
-            return user_message
+            return f"{STATE_PROTOCOL}\n\nUser message:\n{user_message}"
 
         return (
+            f"{STATE_PROTOCOL}\n\n"
             "A compact RAG memory was found for this message. "
             "Use it only if it is relevant; otherwise ignore it.\n\n"
             f"{context}\n\n"
