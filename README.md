@@ -1,6 +1,6 @@
 # Anna
 
-Anna is a desktop GUI wrapper for Hermes Agent. It provides a split interface with a terminal-style Hermes workspace on the left and an avatar panel on the right.
+Anna is a desktop GUI wrapper for Hermes Agent. It provides a split interface with a terminal-style Hermes workspace / Normal Chat mode on the left and an avatar panel on the right. 
 The app is designed to make Hermes feel more like an interactive desktop assistant while still preserving command-line control.
 
 Anna is also the name of the fictional character that's created for this project. 
@@ -17,6 +17,7 @@ Anna is also the name of the fictional character that's created for this project
 - macOS `.app` packaging support
 - Optional Hermes auto-detection from common install paths
 - RAG File memory support, using keyword summary
+- Switchable Chat Mode
 
 ## Requirements
 
