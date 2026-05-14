@@ -40,3 +40,4 @@ which hermes
 - Please Note that this project is vibe coded with GPT 5.5 Thinking
 - The character of Anna is drawn with help from ChatGPT Image 2, with background removal from Canva
 - You can find releases on our release page.
+- ⚠️This application uses YOLO mode, which can directly execute risky code, Please be aware. The author will not hold any responsibilities of any losses caused by the application.
