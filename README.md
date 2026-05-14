@@ -16,6 +16,7 @@ Anna is also the name of the fictional character that's created for this project
 - Local assets for avatar images and terminal frontend files
 - macOS `.app` packaging support
 - Optional Hermes auto-detection from common install paths
+- RAG File memory support, using keyword summary
 
 ## Requirements
 
@@ -24,8 +25,9 @@ Anna is also the name of the fictional character that's created for this project
 - Hermes Agent installed on the system
 - PySide6
 - PySide6-Addons / QtWebEngine
+- Seperate Embedding Model, API settable in Rag menu --> Settings --> Embedding Settings
 
-Hermes must be installed separately unless you manually bundle it with the application.
+Hermes must be installed separately.
 
 You can check whether Hermes is available by running:
 
@@ -33,8 +35,6 @@ You can check whether Hermes is available by running:
 which hermes
 ```
 ## Future Changes And Author's Notes
-- A settings Button
-- RAG Memory Support
 - 3D Modeled Anna controlled by a secondary (hopefully free) AI (Such as Qwen 3.5 4B, which is free on sillicon flow)
 - Please Note that this project is vibe coded with GPT 5.5 Thinking
 - The character of Anna is drawn with help from ChatGPT Image 2, with background removal from Canva
