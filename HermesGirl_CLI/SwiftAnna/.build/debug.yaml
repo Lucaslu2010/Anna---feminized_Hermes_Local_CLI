@@ -1,0 +1,92 @@
+client:
+  name: basic
+  file-system: device-agnostic
+tools: {}
+targets:
+  "AnnaSwift-arm64-apple-macosx26.0-debug.exe": ["<AnnaSwift-arm64-apple-macosx26.0-debug.exe>"]
+  "AnnaSwift-arm64-apple-macosx26.0-debug.module": ["<AnnaSwift-arm64-apple-macosx26.0-debug.module>"]
+  "PackageStructure": ["<PackageStructure>"]
+  "main": ["<AnnaSwift-arm64-apple-macosx26.0-debug.exe>","<AnnaSwift-arm64-apple-macosx26.0-debug.module>"]
+  "test": ["<AnnaSwift-arm64-apple-macosx26.0-debug.exe>","<AnnaSwift-arm64-apple-macosx26.0-debug.module>"]
+default: "main"
+nodes:
+  "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/Sources/AnnaSwift/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+  "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift":
+    is-mutated: true
+commands:
+  "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift-entitlement.plist":
+    tool: write-auxiliary-file
+    inputs: ["<entitlement-plist>","<com.apple.security.get-task-allow>"]
+    outputs: ["/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift-entitlement.plist"]
+    description: "Write auxiliary file /Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift-entitlement.plist"
+
+  "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/Sources/AnnaSwift/AnnaSwiftApp.swift","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/Sources/AnnaSwift/BridgeClient.swift","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/Sources/AnnaSwift/BridgeProcess.swift","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/DerivedSources/resource_bundle_accessor.swift"]
+    outputs: ["/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/sources"]
+    description: "Write auxiliary file /Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/sources"
+
+  "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.product/Objects.LinkFileList":
+    tool: write-auxiliary-file
+    inputs: ["<link-file-list>","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/AnnaSwiftApp.swift.o","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/BridgeClient.swift.o","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/BridgeProcess.swift.o","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/resource_bundle_accessor.swift.o"]
+    outputs: ["/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.product/Objects.LinkFileList"]
+    description: "Write auxiliary file /Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.product/Objects.LinkFileList"
+
+  "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/SwiftAnna_AnnaSwift.bundle/icon.icns":
+    tool: copy-tool
+    inputs: ["/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/Sources/AnnaSwift/Resources/icon.icns"]
+    outputs: ["/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/SwiftAnna_AnnaSwift.bundle/icon.icns"]
+    description: "Copying /Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/Sources/AnnaSwift/Resources/icon.icns"
+
+  "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt":
+    tool: write-auxiliary-file
+    inputs: ["<swift-get-version>","/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"]
+    outputs: ["/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"]
+    always-out-of-date: "true"
+    description: "Write auxiliary file /Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+
+  "<AnnaSwift-arm64-apple-macosx26.0-debug.exe>":
+    tool: phony
+    inputs: ["<AnnaSwift-arm64-apple-macosx26.0-debug.exe-CodeSigning>"]
+    outputs: ["<AnnaSwift-arm64-apple-macosx26.0-debug.exe>"]
+
+  "<AnnaSwift-arm64-apple-macosx26.0-debug.module>":
+    tool: phony
+    inputs: ["/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/AnnaSwiftApp.swift.o","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/BridgeClient.swift.o","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/BridgeProcess.swift.o","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/resource_bundle_accessor.swift.o","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/Modules/AnnaSwift.swiftmodule"]
+    outputs: ["<AnnaSwift-arm64-apple-macosx26.0-debug.module>"]
+
+  "AnnaSwift-arm64-apple-macosx26.0-debug.module-resources":
+    tool: phony
+    inputs: ["/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/SwiftAnna_AnnaSwift.bundle/icon.icns"]
+    outputs: ["<AnnaSwift-arm64-apple-macosx26.0-debug.module-resources>"]
+
+  "C.AnnaSwift-arm64-apple-macosx26.0-debug.exe":
+    tool: shell
+    inputs: ["/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/AnnaSwiftApp.swift.o","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/BridgeClient.swift.o","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/BridgeProcess.swift.o","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/resource_bundle_accessor.swift.o","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.product/Objects.LinkFileList"]
+    outputs: ["/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift"]
+    description: "Linking ./.build/arm64-apple-macosx/debug/AnnaSwift"
+    args: ["/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc","-L","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug","-o","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift","-module-name","AnnaSwift","-Xlinker","-no_warn_duplicate_libraries","-emit-executable","-Xlinker","-alias","-Xlinker","_AnnaSwift_main","-Xlinker","_main","-Xlinker","-rpath","-Xlinker","@loader_path","@/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.product/Objects.LinkFileList","-Xlinker","-rpath","-Xlinker","/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-6.2/macosx","-target","arm64-apple-macosx13.0","-Xlinker","-add_ast_path","-Xlinker","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/Modules/AnnaSwift.swiftmodule","-plugin-path","/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing","-sdk","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk","-F","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks","-F","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks","-I","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib","-L","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib","-g"]
+
+  "C.AnnaSwift-arm64-apple-macosx26.0-debug.exe-entitlements":
+    tool: shell
+    inputs: ["/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift-entitlement.plist"]
+    outputs: ["<AnnaSwift-arm64-apple-macosx26.0-debug.exe-CodeSigning>"]
+    description: "Applying debug entitlements to ./.build/arm64-apple-macosx/debug/AnnaSwift"
+    args: ["codesign","--force","--sign","-","--entitlements","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift-entitlement.plist","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift"]
+
+  "C.AnnaSwift-arm64-apple-macosx26.0-debug.module":
+    tool: shell
+    inputs: ["/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/Sources/AnnaSwift/AnnaSwiftApp.swift","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/Sources/AnnaSwift/BridgeClient.swift","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/Sources/AnnaSwift/BridgeProcess.swift","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/DerivedSources/resource_bundle_accessor.swift","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt","<AnnaSwift-arm64-apple-macosx26.0-debug.module-resources>","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/sources"]
+    outputs: ["/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/AnnaSwiftApp.swift.o","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/BridgeClient.swift.o","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/BridgeProcess.swift.o","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/resource_bundle_accessor.swift.o","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/Modules/AnnaSwift.swiftmodule"]
+    description: "Compiling Swift Module 'AnnaSwift' (4 sources)"
+    args: ["/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc","-module-name","AnnaSwift","-emit-dependencies","-emit-module","-emit-module-path","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/Modules/AnnaSwift.swiftmodule","-output-file-map","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/output-file-map.json","-incremental","-c","@/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/sources","-I","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/Modules","-target","arm64-apple-macosx13.0","-incremental","-enable-batch-mode","-serialize-diagnostics","-index-store-path","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/index/store","-Onone","-enable-testing","-j8","-DSWIFT_PACKAGE","-DDEBUG","-DSWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE","-module-cache-path","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/ModuleCache","-parseable-output","-Xfrontend","-entry-point-function-name","-Xfrontend","AnnaSwift_main","-color-diagnostics","-swift-version","5","-plugin-path","/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing","-sdk","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk","-F","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks","-F","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks","-I","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib","-L","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib","-g","-Xcc","-isysroot","-Xcc","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk","-Xcc","-F","-Xcc","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks","-Xcc","-F","-Xcc","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks","-Xcc","-fPIC","-Xcc","-g","-package-name","swiftanna"]
+
+  "PackageStructure":
+    tool: package-structure-tool
+    inputs: ["/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/Sources/AnnaSwift/","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/Package.swift","/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/Package.resolved"]
+    outputs: ["<PackageStructure>"]
+    description: "Planning build"
+    allow-missing-inputs: true
+

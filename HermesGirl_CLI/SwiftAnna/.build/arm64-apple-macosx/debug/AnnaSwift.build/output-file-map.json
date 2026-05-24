@@ -1,0 +1,33 @@
+{
+  "": {
+    "swift-dependencies": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/master.swiftdeps"
+  },
+  "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/Sources/AnnaSwift/AnnaSwiftApp.swift": {
+    "dependencies": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/AnnaSwiftApp.d",
+    "object": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/AnnaSwiftApp.swift.o",
+    "swiftmodule": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/AnnaSwiftApp~partial.swiftmodule",
+    "swift-dependencies": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/AnnaSwiftApp.swiftdeps",
+    "diagnostics": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/AnnaSwiftApp.dia"
+  },
+  "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/Sources/AnnaSwift/BridgeClient.swift": {
+    "dependencies": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/BridgeClient.d",
+    "object": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/BridgeClient.swift.o",
+    "swiftmodule": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/BridgeClient~partial.swiftmodule",
+    "swift-dependencies": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/BridgeClient.swiftdeps",
+    "diagnostics": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/BridgeClient.dia"
+  },
+  "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/Sources/AnnaSwift/BridgeProcess.swift": {
+    "dependencies": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/BridgeProcess.d",
+    "object": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/BridgeProcess.swift.o",
+    "swiftmodule": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/BridgeProcess~partial.swiftmodule",
+    "swift-dependencies": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/BridgeProcess.swiftdeps",
+    "diagnostics": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/BridgeProcess.dia"
+  },
+  "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/DerivedSources/resource_bundle_accessor.swift": {
+    "dependencies": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/resource_bundle_accessor.d",
+    "object": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/resource_bundle_accessor.swift.o",
+    "swiftmodule": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/resource_bundle_accessor~partial.swiftmodule",
+    "swift-dependencies": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/resource_bundle_accessor.swiftdeps",
+    "diagnostics": "/Users/lucaslu/PycharmProjects/HermesGirl_CLI/SwiftAnna/.build/arm64-apple-macosx/debug/AnnaSwift.build/resource_bundle_accessor.dia"
+  }
+}
