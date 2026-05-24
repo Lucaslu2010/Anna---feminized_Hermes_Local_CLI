@@ -1,4 +1,0 @@
-Anna web admin bootstrap credentials
-username=teacher
-password=jETGRQxQ0wB4GXrRLLqjkQ6H
-Change this password by creating a new teacher account in the management page.
