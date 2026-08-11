@@ -1,3 +1,5 @@
+#This Project has stopped updating becuase Nous Research published Hermes Desktop, which covers all the features I have.
+
 # Anna
 
 Anna is a desktop GUI wrapper for Hermes Agent. It provides a split interface with a terminal-style Hermes workspace / Normal Chat mode on the left and an avatar panel on the right. 
